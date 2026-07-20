@@ -40,7 +40,7 @@ La veille menée pour MobilityPulse poursuit quatre objectifs, directement liés
 
 ### Fréquence et organisation
 
-- **Hebdomadaire (~1 h)** : veille technologique — newsletters, releases des outils suivis.
+- **Hebdomadaire (~1 h)** : veille technologique — newsletters, releases des outils suivis. Collecte pré-mâchée par un **agent IA de veille** (dispositif proposé au §2.3), l'heure humaine étant consacrée à la validation et à l'analyse.
 - **Mensuelle (~1 h)** : veille réglementaire — CNIL, DINUM, ADEME, textes européens.
 - **Trimestrielle** : revue de synthèse diffusée aux parties prenantes (cf. §2.5).
 
@@ -130,10 +130,43 @@ Chaque source candidate est évaluée sur une grille de 4 critères notés de 0 
 2. **Montée des moteurs analytiques légers** : DuckDB (1.5.x, mars 2026) traite confortablement le million d'événements/jour **sur une seule machine**. → **Pour MobilityPulse : un cluster distribué n'est plus un prérequis à ce volume — impact direct sur le budget de 85 k€ et la sobriété.**
 3. **Simplification opérationnelle des briques historiques** : Kafka sans ZooKeeper (KRaft), Airflow 3.x modernisé (versioning des DAGs). Dagster et Prefect restent des alternatives d'orchestration plus légères si Airflow s'avérait surdimensionné. → **Moins de composants à maintenir pour une équipe réduite.**
 4. **Vigilance sur les licences de l'outillage** : mouvement contrasté en 2026 — dbt Fusion publié sous Apache 2.0, GX Core repris par Fivetran en restant Apache 2.0, mais **Soda Core v4 passé sous ELv2**. → **Pour MobilityPulse : vérifier la licence de chaque brique avant de la retenir (fait dans le tableau ci-dessus) ; ce critère entre dans la matrice de décision (C5).**
+5. **Généralisation des agents IA pour les tâches d'analyse documentaire** : les modèles de langage savent désormais exécuter des recherches multi-sources, vérifier des URL et produire des synthèses structurées de façon autonome. → **Pour MobilityPulse : opportunité d'automatiser la collecte de veille elle-même (voir ci-dessous) — en cohérence avec le calendrier de l'AI Act (§2.4).**
 
-### Synthèse exploitable
+### Technologies retenues pour MobilityPulse (issues de la veille)
 
-La veille technologique confirme qu'un **socle 100 % open source sous licence Apache 2.0** (Airflow + dbt + GX Core + Superset, stockage Parquet/Iceberg) couvre l'ensemble du besoin du lot 1 sans coût de licence, avec une complexité maîtrisable par une équipe réduite. Le streaming (Kafka) reste pertinent **en option** pour le lot 2 si le besoin de latence inférieure à quelques minutes est confirmé par l'usage — la volumétrie seule (~13 évts/s en moyenne) ne l'impose pas.
+La veille technologique conduit à retenir pour le **lot 1** un **socle 100 % open source sous licence Apache 2.0** :
+
+| Besoin | Technologie retenue | Version vérifiée (07/2026) |
+|---|---|---|
+| Orchestration des traitements | **Apache Airflow** | 3.3.0 |
+| Transformations SQL tracées et testées | **dbt-core** | 1.12.0 |
+| Contrôles qualité automatisés | **GX Core** (Great Expectations) | 1.19.0 |
+| Tableaux de bord accessibles | **Apache Superset** | 6.1.0 |
+| Stockage analytique | **Parquet / Apache Iceberg** (formats ouverts) | spec V4 |
+
+Ce socle couvre l'ensemble du besoin du lot 1 **sans coût de licence**, avec une complexité maîtrisable par une équipe réduite. Le streaming (**Apache Kafka** 4.3.1) reste pertinent **en option pour le lot 2** si le besoin de latence inférieure à quelques minutes est confirmé par l'usage — la volumétrie seule (~13 évts/s en moyenne) ne l'impose pas. Ces choix restent des recommandations : la décision finale est argumentée dans le rapport C5 (options comparées + matrice de décision).
+
+### Proposition : automatiser la veille hebdomadaire par des agents IA
+
+La méthode utilisée pour produire le présent rapport (agents de recherche parallèles vérifiant sources, dates et versions en ligne) peut être **industrialisée en interne** pour tenir la veille hebdomadaire à moindre effort :
+
+**Fonctionnement proposé (cycle hebdomadaire) :**
+1. **Collecte** — des agents IA parcourent les canaux définis au §2.1 : flux RSS des blogs officiels, API GitHub (nouvelles releases des outils retenus), pages CNIL/DINUM/ADEME.
+2. **Vérification** — chaque information est rattachée à une URL source avec date constatée ; les affirmations sans source vérifiable sont écartées (garde-fou anti-« hallucination »).
+3. **Qualification** — application automatique de la grille du §2.1 (autorité, actualité, fiabilité, utilité) avec score proposé.
+4. **Synthèse et diffusion** — note hebdomadaire pré-rédigée, **validée par un humain avant diffusion** sur le canal de l'équipe (cf. §2.5).
+
+**Technologies à utiliser pour cette solution :**
+
+| Composant | Technologie | Justification |
+|---|---|---|
+| Analyse et synthèse | API de modèle de langage (ex. Claude d'Anthropic) avec outils de recherche web | Capacité vérifiée à rechercher, croiser et citer des sources datées |
+| Collecte des évolutions | Flux RSS/Atom + API GitHub (releases) | Sources primaires structurées, gratuites |
+| Planification | **Apache Airflow** (DAG hebdomadaire) | Réutilise l'orchestrateur du socle — aucun composant supplémentaire |
+| Archivage des notes | Dépôt Git (Markdown) | Traçabilité et historique des veilles |
+| Diffusion | Webhook vers le canal d'équipe + courriel | S'intègre aux outils existants de la DSI |
+
+**Garde-fous (cohérents avec l'AI Act et la charte du projet) :** validation humaine systématique avant diffusion, transparence sur l'usage d'IA dans la note produite, journalisation des sources consultées, coût et sobriété maîtrisés (exécution hebdomadaire unique, pas de collecte continue). Ce dispositif reste une **proposition d'organisation** : sa mise en œuvre relèverait d'un chantier ultérieur, hors périmètre du présent cadrage.
 
 ---
 
@@ -183,7 +216,7 @@ La veille n'a de valeur que partagée. Le dispositif proposé adapte le format �
 
 | Cible | Format | Fréquence | Contenu type |
 |---|---|---|---|
-| Équipe data / DSI | Canal partagé (fil de discussion dédié) + revue des releases | Hebdomadaire | Versions d'outils, correctifs de sécurité, évolutions GTFS |
+| Équipe data / DSI | Canal partagé — note hebdomadaire pré-rédigée par l'agent IA de veille (§2.3), **validée humainement** avant diffusion | Hebdomadaire | Versions d'outils, correctifs de sécurité, évolutions GTFS |
 | Comité projet MobilityPulse | Note de synthèse (1 page) | Mensuelle | Enseignements actionnables : « ce qui change pour le projet » |
 | Direction Mobilité et élus | Encadré « veille » dans le reporting existant | Trimestrielle | 3 messages maximum, sans jargon, avec impacts budget/délai |
 | Référents RGPD, accessibilité, RSE | Alerte ciblée (courriel) | À l'événement | Ex. : annonce du RGAA 5 (03/2026), échéance AI Act du 02/08/2026 |
