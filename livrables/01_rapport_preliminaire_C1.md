@@ -13,7 +13,7 @@ L'analyse des pièces du dossier montre que ces difficultés ne relèvent pas un
 
 Pour y répondre, la Direction Mobilité lance le programme **MobilityPulse**, dont l'objet est de concevoir une architecture de gestion de données capable de consolider les flux de mobilité et de produire des indicateurs fiables pour les métiers. Le cadrage du premier lot doit tenir en moins de 3 mois, pour un budget de lancement plafonné à 85 000 € *(pièce 01)*.
 
-**Les services concernés :** la Direction Mobilité (commanditaire), le centre de supervision, les équipes d'exploitation (réseau et vélos), la relation usagers, la DSI, ainsi que les référents RGPD, accessibilité et RSE *(pièces 02 et 04)*.
+**Les services concernés :** la Direction Mobilité (commanditaire), le centre de supervision, les équipes d'exploitation (réseau et vélos), la relation usagers, la Direction événements (calendrier des manifestations), la DSI, ainsi que les référents RGPD, accessibilité et RSE *(pièces 02 et 04)*. Les élus de la Métropole sont destinataires des indicateurs produits *(pièce 01)*.
 
 **Les enjeux :** fiabiliser les indicateurs partagés avec les élus et les exploitants, réduire le délai de détection des anomalies, prioriser les interventions terrain selon l'impact usager, et préparer à moyen terme un composant d'IA de prédiction — le tout dans le respect du RGPD, de l'accessibilité (RGAA) et de la sobriété numérique *(pièces 00, 01 et 05)*.
 
