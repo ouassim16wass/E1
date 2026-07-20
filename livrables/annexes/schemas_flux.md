@@ -73,40 +73,40 @@ flowchart LR
 
 ---
 
-## Schéma 3 — Architecture cible (version de travail)
-
-> ⚠️ Version préliminaire — sera finalisée avec le cahier des charges (C4) et les recommandations (C5).
+## Schéma 3 — Architecture cible (alignée sur le cahier des charges C4)
 
 ```mermaid
 flowchart TB
-    subgraph SRC["Sources"]
-        X1["SRC01 Capteurs vélos"]
-        X2["SRC02 SAE bus/tram"]
-        X3["SRC03 Incidents"]
-        X4["SRC04 Météo"]
-        X5["SRC05 Événements"]
-        X6["SRC06 Réclamations<br/>(lot 2 — pseudonymisées)"]
+    subgraph SRCS["Sources du lot 1"]
+        X1["SRC01<br/>Capteurs vélos"]
+        X2["SRC02<br/>SAE bus/tram"]
+        X3["SRC03<br/>Incidents terrain"]
+        X4["SRC04<br/>Météo"]
+        X5["SRC05<br/>Événements"]
     end
+    X6["SRC06 Réclamations<br/>(lot 2, pseudonymisées)"]
 
-    SRC --> ING["INGESTION automatisée<br/>connecteurs API + contrats d'interface"]
-    ING --> BRZ["Zone BRUTE (bronze)<br/>rétention courte : 30 j"]
-    BRZ --> SLV["Zone NETTOYÉE (argent)<br/>normalisation, dédoublonnage,<br/>mapping sur le référentiel"]
-    SLV --> GLD["Zone MÉTIER (or)<br/>agrégats + KPI validés"]
-    GLD --> EXP["EXPOSITION<br/>dashboards accessibles RGAA<br/>par rôle + exports + alertes"]
-    EXP --> U["Direction / supervision /<br/>exploitation / élus"]
+    SRCS --> ING["INGESTION automatisée<br/>connecteurs, contrats d'interface<br/>micro-batch 5 à 15 min (Apache Airflow)"]
+    X6 -.-> ING
+    ING --> BRZ["Zone BRUTE<br/>formats ouverts Parquet/Iceberg<br/>rétention 30 jours"]
+    BRZ --> SLV["Zone NETTOYÉE<br/>normalisation, dédoublonnage,<br/>référentiel appliqué (dbt)"]
+    SLV --> GLD["Zone MÉTIER<br/>agrégats et KPI validés"]
+    GLD --> EXP["EXPOSITION<br/>dashboards RGAA 4.1.2 par rôle<br/>alertes sur seuils, exports accessibles<br/>(Apache Superset)"]
+    EXP --> U["Direction, supervision,<br/>exploitation, élus"]
 
-    REF["Référentiel maître<br/>stations · lignes · typologies"] -.-> SLV
-    QUA["Contrôles QUALITÉ automatisés<br/>fraîcheur · complétude · conformité"] -.-> BRZ
+    REF["Référentiel maître<br/>stations, lignes, typologies"] -.-> SLV
+    QUA["Contrôles QUALITÉ automatisés<br/>fraîcheur, complétude, conformité<br/>(GX Core)"] -.-> BRZ
     QUA -.-> SLV
-    ORC["ORCHESTRATION<br/>planification · reprises · journalisation"] -.-> ING
-    ORC -.-> SLV
+    ORC["ORCHESTRATION<br/>planification, reprises,<br/>journalisation, purge automatisée"] -.-> ING
     ORC -.-> GLD
-    GOV["Gouvernance : dictionnaire données & KPI ·<br/>habilitations par rôle · rétention/purge"] -.-> GLD
+    GOV["GOUVERNANCE<br/>dictionnaire données et KPI,<br/>habilitations par rôle, rétention"] -.-> EXP
 
     classDef zone fill:#dbe9ff,stroke:#1a5fb4,color:#0b3060;
     classDef transverse fill:#e2f7e2,stroke:#2d7a2d,color:#123f12;
+    classDef lot2 fill:#eeeeee,stroke:#888888,color:#333333,stroke-dasharray: 5 5;
     class BRZ,SLV,GLD zone;
     class REF,QUA,ORC,GOV transverse;
+    class X6 lot2;
 ```
 
-**Lecture :** chaque brique transverse (en vert) répond à un risque identifié dans la pièce 07 — référentiel maître ↔ données incohérentes, contrôles qualité ↔ rejet métier, rétention ↔ saturation stockage, contrats d'interface ↔ dépendance fournisseur.
+**Lecture :** en bleu les trois zones de données, en vert les briques transverses, en pointillés gris la source reportée au lot 2. Chaque brique verte neutralise un risque de la matrice de la pièce 07 : le référentiel contre les incohérences entre fournisseurs, les contrôles qualité contre le rejet métier des indicateurs, l'orchestration et la purge contre la saturation du stockage, la gouvernance contre les définitions contestées.

@@ -103,23 +103,43 @@ Les objectifs ci-dessous traduisent la commande de la direction *(pièces 00, 01
 
 L'architecture s'organise en couches, chaque brique transverse répondant à un risque identifié dans le dossier *(pièce 07)* :
 
-```
-Sources (SRC01 à SRC05, SRC06 au lot 2)
-   v
-Ingestion automatisée (connecteurs, contrats d'interface)
-   v
-Zone brute (rétention 30 jours) -> Zone nettoyée (référentiel appliqué) -> Zone métier (agrégats, KPI)
-   v
-Exposition : tableaux de bord accessibles par rôle, exports, alertes
+```mermaid
+flowchart TB
+    subgraph SRCS["Sources du lot 1"]
+        X1["SRC01<br/>Capteurs vélos"]
+        X2["SRC02<br/>SAE bus/tram"]
+        X3["SRC03<br/>Incidents terrain"]
+        X4["SRC04<br/>Météo"]
+        X5["SRC05<br/>Événements"]
+    end
+    X6["SRC06 Réclamations<br/>(lot 2, pseudonymisées)"]
 
-Briques transverses :
-- Référentiel maître (stations, lignes, typologies)
-- Contrôles qualité automatisés
-- Orchestration (planification, reprises, journalisation)
-- Gouvernance (dictionnaire, habilitations, rétention et purge)
+    SRCS --> ING["INGESTION automatisée<br/>connecteurs, contrats d'interface<br/>micro-batch 5 à 15 min (Apache Airflow)"]
+    X6 -.-> ING
+    ING --> BRZ["Zone BRUTE<br/>formats ouverts Parquet/Iceberg<br/>rétention 30 jours"]
+    BRZ --> SLV["Zone NETTOYÉE<br/>normalisation, dédoublonnage,<br/>référentiel appliqué (dbt)"]
+    SLV --> GLD["Zone MÉTIER<br/>agrégats et KPI validés"]
+    GLD --> EXP["EXPOSITION<br/>dashboards RGAA 4.1.2 par rôle<br/>alertes sur seuils, exports accessibles<br/>(Apache Superset)"]
+    EXP --> U["Direction, supervision,<br/>exploitation, élus"]
+
+    REF["Référentiel maître<br/>stations, lignes, typologies"] -.-> SLV
+    QUA["Contrôles QUALITÉ automatisés<br/>fraîcheur, complétude, conformité<br/>(GX Core)"] -.-> BRZ
+    QUA -.-> SLV
+    ORC["ORCHESTRATION<br/>planification, reprises,<br/>journalisation, purge automatisée"] -.-> ING
+    ORC -.-> GLD
+    GOV["GOUVERNANCE<br/>dictionnaire données et KPI,<br/>habilitations par rôle, rétention"] -.-> EXP
+
+    classDef zone fill:#dbe9ff,stroke:#1a5fb4,color:#0b3060;
+    classDef transverse fill:#e2f7e2,stroke:#2d7a2d,color:#123f12;
+    classDef lot2 fill:#eeeeee,stroke:#888888,color:#333333,stroke-dasharray: 5 5;
+    class BRZ,SLV,GLD zone;
+    class REF,QUA,ORC,GOV transverse;
+    class X6 lot2;
 ```
 
-Le schéma détaillé figure en annexe (schéma 3 du document annexes/schemas_flux.md).
+Lecture : en bleu les trois zones de données, en vert les briques transverses, en pointillés gris la source reportée au lot 2. Chaque brique verte neutralise un risque de la matrice (référentiel contre les incohérences, qualité contre le rejet métier, orchestration contre la saturation, gouvernance contre les indicateurs contestés).
+
+Le même schéma figure en annexe (schéma 3 du document annexes/schemas_flux.md). Pour le document Word, insérer une capture d'écran du rendu GitHub à cet emplacement.
 
 **Technologies pressenties** (issues de la veille, versions vérifiées au 20/07/2026 ; la décision finale est argumentée dans le rapport C5) : Apache Airflow 3.3 (orchestration), dbt-core 1.12 (transformations tracées), GX Core 1.19 (qualité), Apache Superset 6.1 (tableaux de bord), Parquet/Iceberg (stockage). Socle 100 % open source sous licence Apache 2.0, sans coût de licence.
 
