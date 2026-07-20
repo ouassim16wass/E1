@@ -5,17 +5,15 @@
 
 ## 1.1 Contexte métier
 
-La Métropole de NovaVille exploite un service de mobilité urbaine multimodale : bus, tramway, vélos en libre-service, parkings relais et zones piétonnes instrumentées *(dossier documentaire, pièce 00)*.
+La Métropole de NovaVille exploite un réseau de mobilité multimodal : bus, tramway, vélos en libre-service, parkings relais et zones piétonnes instrumentées *(pièce 00)*. Depuis deux ans, les réclamations des usagers augmentent : retards, ruptures de service, stations saturées, information voyageur incohérente entre application et panneaux *(pièces 00, 04)*.
 
-Depuis deux ans, la Direction Mobilité constate une hausse continue des réclamations des usagers : retards, ruptures de service, stations de vélos saturées et information voyageur incohérente entre les canaux de diffusion (application, panneaux en station) *(pièces 00 et 04)*.
+Ces difficultés révèlent surtout les limites du système d'information : les données existent (capteurs, SAE bus/tram, incidents, météo, événements) mais sont éparpillées dans des outils cloisonnés, consolidées à la main et restituées avec plusieurs jours de retard *(pièces 01, 02)*.
 
-L'analyse des pièces du dossier montre que ces difficultés ne relèvent pas uniquement de l'exploitation du réseau : elles révèlent les limites du système d'information actuel. Les données existent — capteurs des stations, système d'aide à l'exploitation (SAE) des bus et tramways, déclarations d'incidents, météo, calendrier des événements — mais elles sont éparpillées entre des outils qui ne communiquent pas, consolidées manuellement et restituées avec plusieurs jours de retard *(pièces 01 et 02)*.
+La Direction Mobilité lance donc le programme **MobilityPulse** : concevoir une architecture de gestion de données qui consolide les flux de mobilité et produit des indicateurs fiables pour les métiers — premier lot cadré en moins de 3 mois, budget plafonné à 85 000 € *(pièce 01)*.
 
-Pour y répondre, la Direction Mobilité lance le programme **MobilityPulse**, dont l'objet est de concevoir une architecture de gestion de données capable de consolider les flux de mobilité et de produire des indicateurs fiables pour les métiers. Le cadrage du premier lot doit tenir en moins de 3 mois, pour un budget de lancement plafonné à 85 000 € *(pièce 01)*.
+**Services concernés :** Direction Mobilité (commanditaire), centre de supervision, exploitation réseau et vélos, relation usagers, Direction événements, DSI, référents RGPD / accessibilité / RSE ; les élus sont destinataires des indicateurs *(pièces 01, 02, 04)*.
 
-**Les services concernés :** la Direction Mobilité (commanditaire), le centre de supervision, les équipes d'exploitation (réseau et vélos), la relation usagers, la Direction événements (calendrier des manifestations), la DSI, ainsi que les référents RGPD, accessibilité et RSE *(pièces 02 et 04)*. Les élus de la Métropole sont destinataires des indicateurs produits *(pièce 01)*.
-
-**Les enjeux :** fiabiliser les indicateurs partagés avec les élus et les exploitants, réduire le délai de détection des anomalies, prioriser les interventions terrain selon l'impact usager, et préparer à moyen terme un composant d'IA de prédiction — le tout dans le respect du RGPD, de l'accessibilité (RGAA) et de la sobriété numérique *(pièces 00, 01 et 05)*.
+**Enjeux :** fiabiliser les indicateurs, réduire le délai de détection des anomalies, prioriser les interventions selon l'impact usager et préparer un futur composant IA — dans le respect du RGPD, du RGAA et de la sobriété numérique *(pièces 00, 01, 05)*.
 
 ---
 
@@ -23,27 +21,37 @@ Pour y répondre, la Direction Mobilité lance le programme **MobilityPulse**, d
 
 ### Schéma des flux actuels
 
+```mermaid
+flowchart LR
+    subgraph CH1["Chaîne 1 — Capteurs & véhicules"]
+        A1["Capteurs stations<br/>+ SAE bus/tram"] --> A2["Outils<br/>fournisseurs"]
+        A2 --> A3["Exports<br/>MANUELS"]
+        A3 --> A4["Fichiers<br/>partagés"]
+        A4 --> A5["Tableurs BI"]
+    end
+
+    subgraph CH2["Chaîne 2 — Incidents terrain"]
+        B1["Agents<br/>terrain"] --> B2["Formulaire<br/>interne"]
+        B2 --> B3["CSV<br/>hebdomadaire"]
+        B3 --> B4["Consolidation<br/>MANUELLE"]
+    end
+
+    subgraph CH3["Chaîne 3 — Données de contexte"]
+        D1["Météo /<br/>calendrier"] --> D2["Consultation<br/>SÉPARÉE"]
+    end
+
+    A5 --> R["Rapport hebdomadaire<br/>assemblé À LA MAIN"]
+    B4 --> R
+    D2 --> R
+    R --> F["Direction / élus<br/>(information à J+7 ou plus)"]
+
+    classDef manual fill:#ffe3e3,stroke:#cc0000,color:#7a0000;
+    class A3,B3,B4,D2,R manual;
 ```
- CHAÎNE 1 — Données capteurs et véhicules
- ┌──────────────┐   ┌─────────────────┐   ┌──────────────┐   ┌──────────────┐   ┌─────────────┐
- │ Capteurs     │──►│ Outils          │──►│ Exports      │──►│ Fichiers     │──►│ Tableurs BI │
- │ stations/SAE │   │ fournisseurs    │   │ MANUELS      │   │ partagés     │   │ (hebdo)     │
- └──────────────┘   └─────────────────┘   └──────────────┘   └──────────────┘   └─────────────┘
 
- CHAÎNE 2 — Incidents terrain
- ┌──────────────┐   ┌─────────────────┐   ┌──────────────┐   ┌───────────────────┐
- │ Agents       │──►│ Formulaire      │──►│ CSV          │──►│ Consolidation     │
- │ terrain      │   │ interne         │   │ hebdomadaire │   │ MANUELLE          │
- └──────────────┘   └─────────────────┘   └──────────────┘   └───────────────────┘
+*(En rouge : les étapes manuelles. Schéma également disponible en annexe : `annexes/schemas_flux.md`.)*
 
- CHAÎNE 3 — Données de contexte
- ┌──────────────┐   ┌─────────────────┐   ┌───────────────────────────┐
- │ Météo /      │──►│ Consultation    │──►│ Commentaires ajoutés      │
- │ calendrier   │   │ SÉPARÉE         │   │ À LA MAIN aux rapports    │
- └──────────────┘   └─────────────────┘   └───────────────────────────┘
-```
-
-**Lecture du schéma :** aucune des trois chaînes n'est automatisée de bout en bout ; chacune comporte au moins une étape manuelle (en majuscules), source de retards et d'erreurs. Les trois chaînes ne se croisent jamais avant le rapport final : la corrélation entre incidents, saturation et météo est faite « de tête » par les analystes.
+**Lecture du schéma :** aucune des trois chaînes n'est automatisée de bout en bout ; chacune comporte au moins une étape manuelle (en rouge), source de retards et d'erreurs. Les trois chaînes ne se croisent qu'au rapport final, assemblé à la main : la corrélation entre incidents, saturation et météo est faite « de tête » par les analystes, et la direction est informée à J+7 au mieux.
 
 ### Table des sources de données
 
