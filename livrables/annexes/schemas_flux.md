@@ -26,16 +26,25 @@ flowchart LR
         D1["Météo /<br/>calendrier"] --> D2["Consultation<br/>SÉPARÉE"]
     end
 
+    subgraph CH4["Chaîne 4 — Réclamations usagers"]
+        E1["Usagers"] --> E2["Outil CRM<br/>(données personnelles)"]
+    end
+
     A5 --> R["Rapport hebdomadaire<br/>assemblé À LA MAIN"]
     B4 --> R
-    D2 --> R
-    R --> F["Direction / élus<br/>(information à J+7 ou plus)"]
+    D2 -- "commentaires ajoutés<br/>À LA MAIN" --> R
+    E2 -.->|"✗ aucun flux documenté<br/>vers les rapports"| R
+    R --> F["Direction / élus<br/>(délai jusqu'à J+7, voire plus)"]
 
     classDef manual fill:#ffe3e3,stroke:#cc0000,color:#7a0000;
     class A3,B3,B4,D2,R manual;
+    classDef silo fill:#eeeeee,stroke:#888888,color:#333333,stroke-dasharray: 5 5;
+    class E2 silo;
 ```
 
-**Constats :** aucune chaîne automatisée de bout en bout ; les trois chaînes ne se croisent qu'au rapport final ; information disponible à J+7 au mieux.
+**Constats :** aucune chaîne automatisée de bout en bout ; chaque chaîne comporte au moins une étape manuelle (en rouge). Les trois premières chaînes ne se rejoignent qu'au rapport hebdomadaire assemblé à la main ; les réclamations usagers (SRC06) restent cloisonnées dans le CRM, sans flux documenté vers les rapports. Délai d'information de la direction : jusqu'à 7 jours, davantage en cas de retard de saisie.
+
+*Hypothèse signalée : les rapports hebdomadaires manuels sont attestés (pièce 01) mais leur outil d'assemblage n'est pas précisé ; le lien « tableurs BI → rapport » est une interprétation à confirmer.*
 
 ---
 

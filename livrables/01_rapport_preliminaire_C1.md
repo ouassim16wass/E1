@@ -40,18 +40,27 @@ flowchart LR
         D1["Météo /<br/>calendrier"] --> D2["Consultation<br/>SÉPARÉE"]
     end
 
+    subgraph CH4["Chaîne 4 — Réclamations usagers"]
+        E1["Usagers"] --> E2["Outil CRM<br/>(données personnelles)"]
+    end
+
     A5 --> R["Rapport hebdomadaire<br/>assemblé À LA MAIN"]
     B4 --> R
-    D2 --> R
-    R --> F["Direction / élus<br/>(information à J+7 ou plus)"]
+    D2 -- "commentaires ajoutés<br/>À LA MAIN" --> R
+    E2 -.->|"✗ aucun flux documenté<br/>vers les rapports"| R
+    R --> F["Direction / élus<br/>(délai jusqu'à J+7, voire plus)"]
 
     classDef manual fill:#ffe3e3,stroke:#cc0000,color:#7a0000;
     class A3,B3,B4,D2,R manual;
+    classDef silo fill:#eeeeee,stroke:#888888,color:#333333,stroke-dasharray: 5 5;
+    class E2 silo;
 ```
 
-*(En rouge : les étapes manuelles. Schéma également disponible en annexe : `annexes/schemas_flux.md`.)*
+*(En rouge : les étapes manuelles. En pointillés : le silo non intégré. Schéma également disponible en annexe : `annexes/schemas_flux.md`.)*
 
-**Lecture du schéma :** aucune des trois chaînes n'est automatisée de bout en bout ; chacune comporte au moins une étape manuelle (en rouge), source de retards et d'erreurs. Les trois chaînes ne se croisent qu'au rapport final, assemblé à la main : la corrélation entre incidents, saturation et météo est faite « de tête » par les analystes, et la direction est informée à J+7 au mieux.
+**Lecture du schéma :** aucune chaîne n'est automatisée de bout en bout ; chacune comporte au moins une étape manuelle (en rouge), source de retards et d'erreurs. Les trois premières chaînes ne se rejoignent qu'au rapport hebdomadaire, assemblé à la main *(pièces 01, 02)* : la corrélation entre incidents, saturation et météo est faite « de tête » par les analystes. Les réclamations usagers restent cloisonnées dans le CRM : aucun flux documenté ne les relie aux rapports *(pièce 02)*. Selon le moment de l'événement, la direction est informée avec un délai pouvant atteindre 7 jours, davantage en cas de retard de saisie des incidents.
+
+*Note — hypothèse : le dossier atteste les rapports hebdomadaires manuels (pièce 01) sans préciser leur outil d'assemblage ; le lien « tableurs BI → rapport » est une interprétation à confirmer en phase de cadrage.*
 
 ### Table des sources de données
 
