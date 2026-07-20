@@ -96,31 +96,32 @@ Cette problématique se décompose en quatre sous-questions, qui structurent la 
 
 ## 1.4 Synthèse de l'existant
 
-Les irritants relevés dans le dossier documentaire *(pièces 01, 02, 04)* peuvent être classés en trois familles :
+Les irritants relevés dans le dossier documentaire se classent en trois familles.
 
 ### Irritants de gouvernance
-- **Aucun référentiel commun** des stations et des lignes : une même station peut ne pas être reconnue d'un système à l'autre.
-- **Aucun dictionnaire de données partagé** : les indicateurs n'ont pas de définition officielle unique.
-- Conséquence directe : **les chiffres sont contestés** par les équipes terrain — la donnée existe mais ne fait pas autorité.
+- **Absence de référentiel commun** des stations et des lignes : une même station peut ne pas être reconnue d'un système à l'autre *(pièces 02, 07)*.
+- **Aucun dictionnaire de données partagé** : les indicateurs n'ont pas de définition officielle unique *(pièce 02)*.
+- Conséquence : les chiffres des tableaux de bord sont **parfois contestés** par les équipes terrain *(pièce 01)* — risque de rejet métier évalué « probabilité forte, impact fort » *(pièce 07)*.
+- Des **données personnelles circulent en texte libre** dans les réclamations (nom, téléphone), sans cadre de traitement formalisé *(pièces 02, 07)*.
 
 ### Irritants techniques
-- **Formats hétérogènes** selon les fournisseurs de capteurs : horodatages incohérents, doublons (SRC01), champs variables selon les lignes (SRC02).
-- **Contrôles qualité non automatisés** : aucune vérification systématique des données reçues.
-- **Faible traçabilité des transformations** : impossible de savoir comment un chiffre a été obtenu.
-- **Rétention non formalisée** : les exports s'accumulent sans durée de vie définie (risque de saturation et non-conformité RSE).
+- **Événements hétérogènes selon les fournisseurs** *(pièce 01)* : horodatages incohérents et doublons sur les capteurs vélos, champs variables selon les lignes sur le SAE *(pièce 02)*.
+- **Contrôles qualité non automatisés** : aucune vérification systématique des données reçues *(pièce 02)*.
+- **Faible traçabilité des transformations** : difficile de justifier comment un chiffre a été obtenu *(pièce 02)*.
+- **Rétention des exports non formalisée** *(pièce 02)*, avec un risque identifié de saturation du stockage par conservation indéfinie d'événements bruts *(pièce 07)*.
 
 ### Irritants organisationnels
-- **Consolidations manuelles** à chaque étape : exports, copier-coller, rapports hebdomadaires faits à la main.
-- **Retards de saisie** des incidents terrain : l'information arrive après coup dans les rapports.
-- **Données de contexte (météo, événements) jamais intégrées** : la corrélation se fait « de tête ».
-- **Information voyageur incohérente** entre l'application et les panneaux.
-- **Tableaux de bord inaccessibles** aux personnes en situation de handicap.
+- **Incidents saisis manuellement dans plusieurs outils** *(pièce 01)*, avec retards de saisie et typologies non normalisées *(pièce 02)*.
+- **Exports et consolidations manuels** tout au long de la chaîne ; rapports de performance produits à la main chaque semaine *(pièces 01, 02)*.
+- **Météo et calendrier consultés séparément**, sans intégration systématique : de simples commentaires ajoutés aux rapports *(pièces 01, 02)*.
+- **Information voyageur incohérente** entre les canaux (application, panneaux) *(pièces 00, 04)*.
+- **Indicateurs pas toujours accessibles** aux personnes en situation de handicap *(pièce 01)*.
 
 ### Points d'appui (l'existant n'a pas que des faiblesses)
-- Les **données existent déjà** et sont riches : ~1,15 million d'événements par jour couvrant vélos, bus/tram, incidents, météo et événements.
-- Les **volumes restent maîtrisables** pour une architecture moderne (ordre du Go/jour, pas du To/jour).
-- Des **KPI métier sont déjà esquissés** par la direction (pièce 08), chacun associé à une décision.
-- Les **parties prenantes sont identifiées et demandeuses** : les six entretiens (pièce 04) convergent vers le même besoin de fiabilisation.
+- Les **données existent déjà** et couvrent tout le périmètre : capteurs vélos, SAE bus/tram, incidents, météo, événements, réclamations — environ 1,15 million d'enregistrements par jour *(pièce 03)*.
+- Les **volumes restent maîtrisables** pour une architecture moderne : de l'ordre du Go par jour (hypothèse : ~1 Ko par enregistrement, à confirmer en cadrage).
+- **Six KPI métier sont déjà esquissés** par la direction, chacun associé à une décision *(pièce 08)*.
+- Les **parties prenantes sont identifiées et convergentes** sur le besoin de fiabilisation *(pièce 04)*.
 
 ### Limites de l'étude
 - Les volumétries et coûts fournis sont **déclaratifs** (dossier documentaire) et devront être confirmés en phase de cadrage.
