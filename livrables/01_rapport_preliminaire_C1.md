@@ -64,18 +64,18 @@ flowchart LR
 
 ### Table des sources de données
 
-| ID | Source | Volumétrie / jour | Format | Sensibilité RGPD | Qualité | Problèmes connus |
-|---|---|---|---|---|---|---|
-| SRC01 | Capteurs stations vélos | 250 000 événements | JSON / API fournisseur | faible | moyenne | horodatages incohérents, doublons |
-| SRC02 | SAE bus/tram | 900 000 événements | flux propriétaire | faible à moyenne | moyenne | champs variables selon les lignes |
-| SRC03 | Incidents terrain | 300 lignes | CSV (saisie manuelle) | faible | **faible** | retards de saisie, typologies non normalisées |
-| SRC04 | Météo horaire | 2 400 lignes | JSON API | nulle | bonne | coût API, disponibilité |
-| SRC05 | Calendrier événements | 50 lignes | XLSX | nulle | moyenne | données non structurées |
-| SRC06 | Réclamations usagers | 800 tickets | export CRM | **élevée** | moyenne | données personnelles en texte libre |
+| ID | Source | Fréquence | Volumétrie / jour | Format | Propriétaire | RGPD | Qualité | Problèmes connus |
+|---|---|---|---|---|---|---|---|---|
+| SRC01 | Capteurs stations vélos | 1 à 5 min | 250 000 événements | JSON / API fournisseur | Exploitation vélos | faible | moyenne | horodatages incohérents, doublons |
+| SRC02 | SAE bus/tram | temps quasi réel | 900 000 événements | flux propriétaire | Exploitation réseau | faible à moyenne | moyenne | champs variables selon les lignes |
+| SRC03 | Incidents terrain | saisie manuelle | 300 lignes | CSV exporté | Centre supervision | faible | **faible** | retards de saisie, typologies non normalisées |
+| SRC04 | Météo horaire | horaire | 2 400 lignes | JSON API | DSI | nulle | bonne | coût API, disponibilité |
+| SRC05 | Calendrier événements | hebdomadaire | 50 lignes | XLSX | Direction événements | nulle | moyenne | données non structurées |
+| SRC06 | Réclamations usagers | quotidien | 800 tickets | export CRM | Relation usagers | **élevée** | moyenne | données personnelles en texte libre |
 
 *Source : catalogue des sources (pièce 03) et cartographie des flux (pièce 02).*
 
-**Constat clé :** deux sources (SRC01 et SRC02) concentrent environ 1 150 000 événements par jour, soit **99,7 % du volume total**. À l'inverse, la seule source sensible au titre du RGPD (SRC06) ne représente que 0,07 % du volume. Ce déséquilibre orientera les choix d'architecture (sobriété, rétention) et de conformité (minimisation).
+**Constat clé :** deux sources (SRC01 et SRC02) concentrent environ 1 150 000 enregistrements par jour, soit **99,7 % du volume total en nombre d'enregistrements**. À l'inverse, la seule source sensible au titre du RGPD (SRC06) n'en représente que 0,07 %. Ce déséquilibre orientera les choix d'architecture (sobriété, rétention) et de conformité (minimisation). La colonne Fréquence montre par ailleurs que seules SRC01 et SRC02 relèvent du quasi temps réel : les quatre autres sources sont naturellement compatibles avec un traitement périodique.
 
 ---
 
